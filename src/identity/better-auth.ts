@@ -44,7 +44,19 @@ function createAuth() {
 
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: true,
+      /**
+       * TEMPORARY, EXPLICIT, REVERSIBLE (2026-11-09).
+       *
+       * BUILD-PROMPT §12.A requires "the user can verify their email", and §3.A
+       * step 4 places verification in the merchant journey. No email provider is
+       * connected (CranL Email reports connected:false and can only be connected
+       * by the owner from the dashboard), so that step cannot be completed yet.
+       *
+       * The default stays TRUE (secure). It is only relaxed when a deployment
+       * sets EMAIL_VERIFICATION_REQUIRED=false — recorded in docs/evidence and
+       * to be reverted as soon as the provider is live.
+       */
+      requireEmailVerification: process.env.EMAIL_VERIFICATION_REQUIRED !== "false",
       minPasswordLength: 10,
       maxPasswordLength: 256,
       autoSignIn: false,

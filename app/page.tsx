@@ -28,19 +28,25 @@ export default function Home() {
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-3">
+        {/* BUILD-PROMPT §3.A step 2: "يضغط على ابدأ مجانًا". */}
+        <Link
+          href="/sign-up"
+          className="inline-flex items-center gap-2 rounded-pill bg-navy px-6 py-3 font-medium text-warm-white transition-opacity hover:opacity-90"
+        >
+          ابدأ مجانًا <span aria-hidden>←</span>
+        </Link>
+        <Link
+          href="/sign-in"
+          className="rounded-pill border border-navy/25 px-6 py-3 font-medium text-navy transition-colors hover:bg-mint"
+        >
+          تسجيل الدخول
+        </Link>
         <Link
           href="/style"
-          className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white transition-opacity hover:opacity-90"
+          className="rounded-pill px-4 py-3 text-note font-medium text-slate underline underline-offset-4"
         >
-          صفحة الهوية (Style)
+          نظام الهوية
         </Link>
-        {/*
-          There was a second link to /ar/style. Locale routing (T0.4) is not
-          built yet, so that route does not exist and the link returned 404 —
-          the reason every link on this page was broken in production.
-          tools/check-routes.mjs now fails the build if an internal href has no
-          matching route file, so this cannot recur silently.
-        */}
       </div>
 
       <p className="text-note text-navy/50">

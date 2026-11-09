@@ -15,6 +15,13 @@
       "when": 1794239066541,
       "tag": "0003_auth_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794264079740,
+      "tag": "0005_merchant_profile",
+      "breakpoints": true
     }
   ]
 }

@@ -32,7 +32,11 @@ export interface OnboardingInput {
   userId: string;
   email: string;
   merchantName: string;
+  /** cafe | restaurant | salon | retail | specialty | other (BUILD-PROMPT §3.A step 6). */
+  businessType?: string;
   country?: string;
+  city?: string;
+  currency?: string;
   timezone?: string;
   defaultLanguage?: string;
 }
@@ -87,8 +91,12 @@ export async function createMerchantForOwner(
       const scoped = tx as unknown as ReturnType<typeof getDb>;
       await scoped.insert(merchants).values({
         id: merchantId,
-        name: input.merchantName,
+        businessName: input.merchantName,
         slug,
+        businessType: input.businessType ?? null,
+        city: input.city ?? null,
+        currency: input.currency ?? "BHD",
+        contactEmail: input.email,
         ownerUserId: input.userId,
         country: input.country ?? "BH",
         timezone: input.timezone ?? "Asia/Bahrain",

@@ -32,9 +32,26 @@ export const merchants = pgTable(
   "merchants",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    name: text("name").notNull(),
+    /**
+     * BUILD-PROMPT §6 calls this field `business_name`. The physical column is
+     * still `name`: renaming it makes `drizzle-kit generate` ask an interactive
+     * "rename or drop+add?" question that cannot be answered in a headless
+     * build, and hand-editing the migration snapshot risks silent drift.
+     * The code-facing name matches the reference; a dedicated rename migration
+     * is tracked in ADR-002 §2.b as a follow-up.
+     */
+    businessName: text("name").notNull(),
     slug: text("slug").notNull(),
+    /** cafe | restaurant | salon | retail | specialty | other */
+    businessType: text("business_type"),
+    city: text("city"),
+    /** ISO-4217, e.g. BHD. Drives every money display in the product. */
+    currency: text("currency").notNull().default("BHD"),
     logoUrl: text("logo_url"),
+    primaryColor: text("primary_color"),
+    secondaryColor: text("secondary_color"),
+    contactEmail: text("contact_email"),
+    contactPhone: text("contact_phone"),
     defaultLanguage: text("default_language").notNull().default("ar"),
     country: text("country").notNull().default("BH"),
     timezone: text("timezone").notNull().default("Asia/Bahrain"),
