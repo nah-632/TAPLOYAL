@@ -1,0 +1,61 @@
+TAP version 13
+# 2026-11-09T18:50:12.481Z WARN [Better Auth]: [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+# Subtest: authentication end-to-end
+    # Subtest: the runtime connects as the restricted role (RLS cannot be bypassed)
+    ok 1 - the runtime connects as the restricted role (RLS cannot be bypassed)
+      ---
+      duration_ms: 1608.983
+      type: 'test'
+      ...
+    # Subtest: sign-up stores the password as Argon2id, never in plaintext
+    ok 2 - sign-up stores the password as Argon2id, never in plaintext
+      ---
+      duration_ms: 4681.952
+      type: 'test'
+      ...
+    # Subtest: sign-in is refused until the email is verified
+    ok 3 - sign-in is refused until the email is verified
+      ---
+      duration_ms: 1379.56
+      type: 'test'
+      ...
+# 2026-11-09T18:50:22.877Z WARN [Better Auth]: Invalid password
+    # Subtest: wrong password is refused
+    ok 4 - wrong password is refused
+      ---
+      duration_ms: 2457.886
+      type: 'test'
+      ...
+    # Subtest: correct credentials create a session that resolves server-side
+    ok 5 - correct credentials create a session that resolves server-side
+      ---
+      duration_ms: 3797.972
+      type: 'test'
+      ...
+    # Subtest: CANARY: a signed-in identity with no profile row cannot resolve a tenant
+    ok 6 - CANARY: a signed-in identity with no profile row cannot resolve a tenant
+      ---
+      duration_ms: 2791.006
+      type: 'test'
+      ...
+    # Subtest: cleanup
+    ok 7 - cleanup
+      ---
+      duration_ms: 2248.626
+      type: 'test'
+      ...
+    1..7
+ok 1 - authentication end-to-end
+  ---
+  duration_ms: 19001.267
+  type: 'test'
+  ...
+1..1
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 40834.249

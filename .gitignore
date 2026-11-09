@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Secrets — never commit (SPEC §9, §12)
+.env
+.env.local
+.env.*.local
+*.pem
+*.p12
+*.key
+*.mobileprovision
+
+# OS / editor
+.DS_Store
+*.log
+next-env.d.ts
+tsconfig.tsbuildinfo
+.test-build/

@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: can() denies by default for an unknown or absent role
+ok 1 - can() denies by default for an unknown or absent role
+  ---
+  duration_ms: 28.521
+  type: 'test'
+  ...
+# Subtest: staff is restricted by capability, not by UI
+ok 2 - staff is restricted by capability, not by UI
+  ---
+  duration_ms: 3.353
+  type: 'test'
+  ...
+# Subtest: merchant_owner gets the business capabilities
+ok 3 - merchant_owner gets the business capabilities
+  ---
+  duration_ms: 3.182
+  type: 'test'
+  ...
+# Subtest: platform permissions are not reachable from tenant roles
+ok 4 - platform permissions are not reachable from tenant roles
+  ---
+  duration_ms: 3.724
+  type: 'test'
+  ...
+# Subtest: only super_admin requires a second factor
+ok 5 - only super_admin requires a second factor
+  ---
+  duration_ms: 4.151
+  type: 'test'
+  ...
+# Subtest: authorize rejects an unauthenticated caller
+ok 6 - authorize rejects an unauthenticated caller
+  ---
+  duration_ms: 12.193
+  type: 'test'
+  ...
+# Subtest: authorize refuses a tenant role with no tenant
+ok 7 - authorize refuses a tenant role with no tenant
+  ---
+  duration_ms: 4.794
+  type: 'test'
+  ...
+# Subtest: authorize enforces MFA for the super admin even when the permission is granted
+ok 8 - authorize enforces MFA for the super admin even when the permission is granted
+  ---
+  duration_ms: 5.246
+  type: 'test'
+  ...
+# Subtest: authorize admits a super admin once MFA is satisfied
+ok 9 - authorize admits a super admin once MFA is satisfied
+  ---
+  duration_ms: 5.781
+  type: 'test'
+  ...
+# Subtest: authorize rejects staff asking for an analytics permission
+ok 10 - authorize rejects staff asking for an analytics permission
+  ---
+  duration_ms: 6.706
+  type: 'test'
+  ...
+# Subtest: toResolvedSession rejects an inactive account
+ok 11 - toResolvedSession rejects an inactive account
+  ---
+  duration_ms: 6.516
+  type: 'test'
+  ...
+# Subtest: toResolvedSession rejects a tenant role with no merchant
+ok 12 - toResolvedSession rejects a tenant role with no merchant
+  ---
+  duration_ms: 4.302
+  type: 'test'
+  ...
+# Subtest: toResolvedSession accepts a super admin with no merchant
+ok 13 - toResolvedSession accepts a super admin with no merchant
+  ---
+  duration_ms: 2.804
+  type: 'test'
+  ...
+# Subtest: CANARY: session resolution cannot succeed without a profile row
+ok 14 - CANARY: session resolution cannot succeed without a profile row
+  ---
+  duration_ms: 2.88
+  type: 'test'
+  ...
+# Subtest: assertTenantContext rejects a missing session
+ok 15 - assertTenantContext rejects a missing session
+  ---
+  duration_ms: 33.764
+  type: 'test'
+  ...
+# Subtest: assertTenantContext rejects a session with no merchant id
+ok 16 - assertTenantContext rejects a session with no merchant id
+  ---
+  duration_ms: 4.203
+  type: 'test'
+  ...
+# Subtest: assertTenantContext rejects a non-uuid merchant id (no silent coercion)
+ok 17 - assertTenantContext rejects a non-uuid merchant id (no silent coercion)
+  ---
+  duration_ms: 6.362
+  type: 'test'
+  ...
+# Subtest: assertTenantContext accepts a well-formed tenant session
+ok 18 - assertTenantContext accepts a well-formed tenant session
+  ---
+  duration_ms: 5.963
+  type: 'test'
+  ...
+# Subtest: withTenant scopes the transaction to the session's merchant id
+ok 19 - withTenant scopes the transaction to the session's merchant id
+  ---
+  duration_ms: 17.053
+  type: 'test'
+  ...
+# Subtest: withTenant grants super-admin context only for the super_admin role
+ok 20 - withTenant grants super-admin context only for the super_admin role
+  ---
+  duration_ms: 7.114
+  type: 'test'
+  ...
+# Subtest: CANARY: a missing tenant context issues ZERO statements
+ok 21 - CANARY: a missing tenant context issues ZERO statements
+  ---
+  duration_ms: 11.32
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2923.923

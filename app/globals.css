@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* ============================================================================
+ * taployal design tokens — SINGLE SOURCE OF TRUTH
+ * SPEC §10.1 (colors), §10.2 (type scale), §10.4 (radii)
+ * ADR-008: no hex value or font family may appear anywhere else in UI code.
+ * ========================================================================== */
+
+@theme {
+  /* --- Brand colors (the only palette allowed in the platform UI) --- */
+  --color-navy: #0b1f3b;
+  --color-teal: #00a996;
+  --color-mint: #e6f7f2;
+  --color-cream: #fafaf7;
+  --color-gold: #d4af37;
+
+  /* --- Status colors (§10.1: always paired with an icon + text label) --- */
+  --color-success: #00a996;
+  --color-error: #c0392b;
+  --color-warning: #d97706;
+
+  /* --- Typography (§10.2) --- */
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-inter);
+  --font-arabic-display: var(--font-noto-naskh);
+  --font-arabic-body: var(--font-plex-arabic);
+
+  /* --- Type scale (§10.2) --- */
+  --text-hero: 3.5rem;
+  --text-hero--line-height: 1.1;
+  --text-hero-mobile: 2.25rem;
+  --text-hero-mobile--line-height: 1.15;
+  --text-page-title: 1.75rem;
+  --text-page-title--line-height: 1.3;
+  --text-section: 1.25rem;
+  --text-section--line-height: 1.4;
+  --text-note: 0.8125rem;
+  --text-note--line-height: 1.5;
+
+  /* --- Radii (§10.4) --- */
+  --radius-container: 24px;
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+}
+
+/* ============================================================================
+ * Base layer
+ * ========================================================================== */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-navy);
+    font-family: var(--font-arabic-body), var(--font-body), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Arabic must never carry letter-spacing (SPEC §10.5 / GLOBAL §19). */
+  :lang(ar) {
+    letter-spacing: normal !important;
+  }
+
+  /* Arabic headings use the Naskh serif counterpart to Playfair Display. */
+  :lang(ar) h1,
+  :lang(ar) h2,
+  :lang(ar) h3,
+  :lang(ar) h4 {
+    font-family: var(--font-arabic-display), serif;
+    font-weight: 600;
+  }
+
+  :lang(en) h1,
+  :lang(en) h2,
+  :lang(en) h3,
+  :lang(en) h4 {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 600;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-teal);
+    outline-offset: 2px;
+  }
+}

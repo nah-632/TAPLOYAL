@@ -1,0 +1,34 @@
+
+──── PHASE 0: fixture ────
+  tenant A pass balance = 3, tenant B pass balance = 5
+
+──── PHASE 1: earn, idempotency, undo (as taployal_app, tenant A) ────
+  ✓ earn_first = ok (expected ok)
+  ✓ earn_duplicate (same key) = ok (expected ok)
+  ✓ earn_second (new key) = ok (expected ok)
+  ✓ undo_second = ok (expected ok)
+  ✓ final balance = 4 (expected 4)
+  ✓ ledger rows (duplicate must not add one) = 3 (expected 3)
+  ✓ wallet jobs enqueued = 3 (expected 3)
+
+──── PHASE 2: cross-tenant attack (tenant A touching tenant B's pass) ────
+  ✓ cross-tenant call raised = raised:P0002 (expected raised:P0002)
+  ✓ tenant B balance untouched = 5 (expected 5)
+  ✓ tenant B ledger untouched = 0 (expected 0)
+
+──── PHASE 3: atomicity — failed transaction leaves NO ledger row and NO job ────
+  ✓ overdraft raised = raised:23514 (expected raised:23514)
+  ✓ balance unchanged after failure = 4 (expected 4)
+  ✓ no ledger row for failed attempt = 3 (expected 3)
+  ✓ no job enqueued for failed attempt = 3 (expected 3)
+  ✓ idempotency key K4 not consumed = 0 (expected 0)
+
+──── PHASE 4: queue claim never duplicates work ────
+  ✓ two claims returned two rows = 2 (expected 2)
+  ✓ claim1 != claim2 = true (expected true)
+
+──── PHASE 5: RLS on job_queue — tenant B sees none of tenant A's jobs ────
+  ✓ tenant B sees 0 of tenant A's jobs = 0 (expected 0)
+
+════ SUMMARY ════
+assertions: 18 · failed: 0

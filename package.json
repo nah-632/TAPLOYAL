@@ -1,0 +1,49 @@
+{
+  "name": "taployal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "node tools/patch-next-for-sandbox.mjs",
+    "predev": "node tools/patch-next-for-sandbox.mjs",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "patch:sandbox": "node tools/patch-next-for-sandbox.mjs",
+    "check:tokens": "node tools/check-tokens.mjs",
+    "check:logical": "node tools/check-logical-css.mjs",
+    "check": "node tools/check-tokens.mjs && node tools/check-logical-css.mjs && tsc --noEmit",
+    "test:unit": "sh tools/run-unit-tests.sh",
+    "test:isolation": "node test/security/isolation.test.mjs",
+    "test:engine": "node test/security/transaction-engine.test.mjs",
+    "test:onboarding": "node test/security/onboarding.test.mjs",
+    "test:integration": "sh tools/run-integration-tests.sh",
+    "test": "npm run test:unit && npm run test:isolation && npm run test:engine && npm run test:onboarding",
+    "test:all": "npm test && npm run test:integration",
+    "db:migrate": "node tools/cranl-migrate.mjs",
+    "db:query": "node tools/cranl-query.mjs",
+    "sync:workspace": "sh tools/sync-workspace.sh"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
+    "better-auth": "^1.7.18",
+    "drizzle-orm": "^0.45.4",
+    "next": "16.4.5",
+    "postgres": "^4.1.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/noto-naskh-arabic": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.11",
+    "tailwindcss": "4.3.5",
+    "typescript": "5.9.3"
+  }
+}

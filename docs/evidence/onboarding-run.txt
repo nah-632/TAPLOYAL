@@ -1,0 +1,17 @@
+
+fresh merchant id for this run: 8c808016-7a46-4938-a2c1-5f120f60aa0a
+
+──── PHASE 1: onboarding as taployal_app, scoped to the NEW id ────
+  ✓ create merchant under a fresh id = ok (expected ok)
+  ✓ create owner profile row = ok (expected ok)
+
+──── PHASE 2: negative control — same session, a DIFFERENT id ────
+  ✓ cannot insert a merchant under another id = raised:42501 (expected raised:42501)
+  ✓ cannot insert a profile row for another tenant = raised:42501 (expected raised:42501)
+  ✓ only its own merchant is visible = 1 (expected 1)
+
+──── PHASE 3: cleanup ────
+  ✓ fixture removed = 0 (expected 0)
+
+════ SUMMARY ════
+assertions: 6 · failed: 0

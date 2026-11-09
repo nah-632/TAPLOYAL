@@ -1,0 +1,50 @@
+
+──── PHASE 1: seed two tenants ────
+  seeded tenant A and tenant B
+
+──── PHASE 2: as taployal_app, tenant A ────
+  ✓ users:own = 1 (expected 1)
+  ✓ users:other = 0 (expected 0)
+  ✓ branches:own = 1 (expected 1)
+  ✓ branches:other = 0 (expected 0)
+  ✓ loyalty_cards:own = 1 (expected 1)
+  ✓ loyalty_cards:other = 0 (expected 0)
+  ✓ customers:own = 1 (expected 1)
+  ✓ customers:other = 0 (expected 0)
+  ✓ passes:own = 1 (expected 1)
+  ✓ passes:other = 0 (expected 0)
+  ✓ apple_pass_registrations:own = 1 (expected 1)
+  ✓ apple_pass_registrations:other = 0 (expected 0)
+  ✓ rewards:own = 1 (expected 1)
+  ✓ rewards:other = 0 (expected 0)
+  ✓ transactions:own = 1 (expected 1)
+  ✓ transactions:other = 0 (expected 0)
+  ✓ redemptions:own = 1 (expected 1)
+  ✓ redemptions:other = 0 (expected 0)
+  ✓ subscriptions:own = 1 (expected 1)
+  ✓ subscriptions:other = 0 (expected 0)
+  ✓ invoices:own = 1 (expected 1)
+  ✓ invoices:other = 0 (expected 0)
+  ✓ push_jobs:own = 1 (expected 1)
+  ✓ push_jobs:other = 0 (expected 0)
+  ✓ audit_logs:own = 1 (expected 1)
+  ✓ audit_logs:other = 0 (expected 0)
+  ✓ merchants:own = 1 (expected 1)
+  ✓ merchants:other = 0 (expected 0)
+  ✓ plans:own (global catalogue) = 3 (expected 3)
+
+──── PHASE 3: no tenant context (must fail closed) ────
+  ✓ tenant-scoped rows visible with NO context = 0 (expected 0)
+  ✓ global catalogue still readable (by design) = 3 (expected 3)
+
+──── PHASE 4: explicit super-admin context ────
+  ✓ super:merchants (sees both) = 2 (expected 2)
+  ✓ super:customers (sees both) = 2 (expected 2)
+
+──── PHASE 5: CANARY — prove the suite can FAIL ────
+  ✓ with RLS disabled, cross-tenant rows appeared: 1 (expected > 0)
+  → proves phases 2–4 measure real enforcement, not a vacuous pass
+  restored RLS on customers
+
+════ SUMMARY ════
+assertions: 33 · failed: 0 · canary detected: true
