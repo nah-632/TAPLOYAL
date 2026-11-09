@@ -12,7 +12,7 @@
     "patch:sandbox": "node tools/patch-next-for-sandbox.mjs",
     "check:tokens": "node tools/check-tokens.mjs",
     "check:logical": "node tools/check-logical-css.mjs",
-    "check": "node tools/check-tokens.mjs && node tools/check-logical-css.mjs && tsc --noEmit",
+    "check": "node tools/check-tokens.mjs && node tools/check-logical-css.mjs && node tools/check-routes.mjs && tsc --noEmit",
     "test:unit": "sh tools/run-unit-tests.sh",
     "test:isolation": "node test/security/isolation.test.mjs",
     "test:engine": "node test/security/transaction-engine.test.mjs",

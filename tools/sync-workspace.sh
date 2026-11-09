@@ -11,12 +11,17 @@ set -e
 SRC=/root/taployal
 DST=/var/minis/workspace/taployal
 
+# The destination is a MIRROR, so stale files must be removed first: tar extract
+# only adds/overwrites and would otherwise leave behind artifacts (a
+# tsconfig.tsbuildinfo lingered for exactly this reason).
+rm -rf "$DST"
 mkdir -p "$DST"
 cd "$SRC"
 
 tar cf - \
   --exclude='./node_modules' \
   --exclude='./.next' \
+  --exclude='./.git' \
   --exclude='./.env.local' \
   --exclude='./.env' \
   --exclude='./.env.*.local' \

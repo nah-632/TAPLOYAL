@@ -27,12 +27,13 @@ export default function Home() {
         >
           صفحة الهوية (Style)
         </Link>
-        <Link
-          href="/ar/style"
-          className="rounded-pill border border-navy/20 px-6 py-3 font-medium text-navy transition-colors hover:bg-mint"
-        >
-          عربي
-        </Link>
+        {/*
+          There was a second link to /ar/style. Locale routing (T0.4) is not
+          built yet, so that route does not exist and the link returned 404 —
+          the reason every link on this page was broken in production.
+          tools/check-routes.mjs now fails the build if an internal href has no
+          matching route file, so this cannot recur silently.
+        */}
       </div>
 
       <p className="text-note text-navy/50">
