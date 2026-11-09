@@ -5,6 +5,9 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "@/identity/server-session";
 import { SignInForm } from "./sign-in-form";
 
+/** Reads the session cookie — must never be prerendered (see /dashboard). */
+export const dynamic = "force-dynamic";
+
 /** Sign-in — BUILD-PROMPT §4 ("Sign in" page). */
 export default async function SignInPage() {
   if (await getServerSession()) redirect("/dashboard");

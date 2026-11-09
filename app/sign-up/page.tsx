@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "@/identity/server-session";
 import { SignUpForm } from "./sign-up-form";
 
+/** Reads the session cookie — must never be prerendered (see /dashboard). */
+export const dynamic = "force-dynamic";
+
 /** Merchant sign-up — BUILD-PROMPT §3.A steps 2-3, §4 (Sign up page). */
 export default async function SignUpPage() {
   if (await getServerSession()) redirect("/dashboard");

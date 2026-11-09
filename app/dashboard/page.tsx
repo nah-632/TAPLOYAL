@@ -4,6 +4,14 @@ import { requireTenant } from "@/identity/server-session";
 import { SignOutButton } from "./sign-out-button";
 
 /**
+ * Per-user page: it reads the session cookie, so it must never be prerendered.
+ * Declared explicitly because Next otherwise tried to generate it at build
+ * time, where runtime secrets (BETTER_AUTH_SECRET) do not exist — the build
+ * failed with "BETTER_AUTH_SECRET must be set in production".
+ */
+export const dynamic = "force-dynamic";
+
+/**
  * Dashboard shell — the entry point of BUILD-PROMPT §4 (dashboard) and the
  * destination of §3.A step 19.
  *

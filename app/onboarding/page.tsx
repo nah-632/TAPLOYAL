@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { getServerSession, getTenantSession } from "@/identity/server-session";
 import { createBusiness } from "./actions";
 
+/** Reads the session cookie — must never be prerendered (see /dashboard). */
+export const dynamic = "force-dynamic";
+
 /** Setup wizard — BUILD-PROMPT §3.A steps 5-6, §4 (setup wizard). */
 
 const TYPES = [
