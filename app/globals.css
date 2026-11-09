@@ -7,17 +7,26 @@
  * ========================================================================== */
 
 @theme {
-  /* --- Brand colors (the only palette allowed in the platform UI) --- */
-  --color-navy: #0b1f3b;
-  --color-teal: #00a996;
-  --color-mint: #e6f7f2;
-  --color-cream: #fafaf7;
-  --color-gold: #d4af37;
+  /* --- Brand colours -------------------------------------------------------
+   * SOURCE: docs/BUILD-PROMPT.md §11.A (the adopted build reference).
+   * Corroborated by the supplied logo, whose measured pixels are 46% navy
+   * (#081E36) and 12% teal, with NO gold — which is why gold is gone from
+   * this palette. Do not reintroduce a colour that is not listed here.
+   * ---------------------------------------------------------------------- */
+  --color-navy: #14243a;
+  --color-midnight: #1d3557;
+  --color-teal: #16a6a1;
+  --color-mint: #ddf5f0;
+  --color-warm-white: #fafbfc;
+  --color-slate: #64748b;
 
-  /* --- Status colors (§10.1: always paired with an icon + text label) --- */
-  --color-success: #00a996;
+  /* --- Status colours ------------------------------------------------------
+   * Semantics, not brand: a status must never be drawn from the brand hues,
+   * and is always paired with an icon and a text label.
+   * ---------------------------------------------------------------------- */
+  --color-success: #16a6a1;
   --color-error: #c0392b;
-  --color-warning: #d97706;
+  --color-warning: #b45309;
 
   /* --- Typography (§10.2) --- */
   --font-display: var(--font-playfair);
@@ -53,7 +62,7 @@
   }
 
   body {
-    background-color: var(--color-cream);
+    background-color: var(--color-warm-white);
     color: var(--color-navy);
     font-family: var(--font-arabic-body), var(--font-body), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;

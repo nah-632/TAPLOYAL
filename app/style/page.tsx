@@ -10,11 +10,12 @@ import Link from "next/link";
  */
 
 const COLORS = [
-  { name: "Deep Navy", token: "--color-navy", cls: "bg-navy", text: "text-cream" },
-  { name: "Teal", token: "--color-teal", cls: "bg-teal", text: "text-cream" },
-  { name: "Mint", token: "--color-mint", cls: "bg-mint", text: "text-navy" },
-  { name: "Cream", token: "--color-cream", cls: "bg-cream", text: "text-navy" },
-  { name: "Gold", token: "--color-gold", cls: "bg-gold", text: "text-navy" },
+  { name: "Deep Navy", token: "--color-navy", cls: "bg-navy", text: "text-warm-white" },
+  { name: "Midnight Blue", token: "--color-midnight", cls: "bg-midnight", text: "text-warm-white" },
+  { name: "Electric Teal", token: "--color-teal", cls: "bg-teal", text: "text-warm-white" },
+  { name: "Soft Mint", token: "--color-mint", cls: "bg-mint", text: "text-navy" },
+  { name: "Warm White", token: "--color-warm-white", cls: "bg-warm-white", text: "text-navy" },
+  { name: "Slate Gray", token: "--color-slate", cls: "bg-slate", text: "text-warm-white" },
 ];
 
 const STATUS = [
@@ -27,9 +28,13 @@ export default function StylePage() {
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-12 px-6 py-14">
       <header className="flex flex-col gap-3">
-        <p className="text-note font-medium uppercase tracking-[0.3em] text-gold">
-          TAP. COLLECT. REDEEM.
-        </p>
+        <img
+          src="/brand/taployal-logo.png"
+          alt="taployal — Tap. Collect. Redeem."
+          width={277}
+          height={106}
+          className="h-auto w-[200px]"
+        />
         <h1 className="text-page-title">نظام الهوية — taployal</h1>
         <p className="text-navy/70">
           كل رمز بصري في المنصة يأتي من مصدر واحد: <code>app/globals.css</code>. لا
@@ -97,10 +102,10 @@ export default function StylePage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-section">الأزرار</h2>
         <div className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded-pill bg-gold px-6 py-3 font-medium text-navy">
+          <button className="inline-flex items-center gap-2 rounded-pill bg-teal px-6 py-3 font-medium text-warm-white">
             إجراء أساسي على خلفية داكنة <span aria-hidden>←</span>
           </button>
-          <button className="rounded-pill bg-navy px-6 py-3 font-medium text-cream">
+          <button className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white">
             إجراء أساسي على خلفية فاتحة
           </button>
           <button className="rounded-pill border border-navy/30 px-6 py-3 font-medium text-navy">
@@ -108,13 +113,13 @@ export default function StylePage() {
           </button>
           <button
             aria-label="تشغيل"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-navy text-cream"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-navy text-warm-white"
           >
             <span aria-hidden>▶</span>
           </button>
         </div>
         <div className="rounded-container bg-navy p-6">
-          <button className="inline-flex items-center gap-2 rounded-pill bg-gold px-6 py-3 font-medium text-navy">
+          <button className="inline-flex items-center gap-2 rounded-pill bg-teal px-6 py-3 font-medium text-warm-white">
             زر ذهبي داخل قسم داكن <span aria-hidden>←</span>
           </button>
         </div>
@@ -158,14 +163,14 @@ export default function StylePage() {
           <label className="flex flex-col gap-2">
             <span className="text-note font-medium">اسم المتجر</span>
             <input
-              className="rounded-card border border-navy/20 bg-cream px-4 py-3 text-navy outline-none focus-visible:border-teal"
+              className="rounded-card border border-navy/20 bg-warm-white px-4 py-3 text-navy outline-none focus-visible:border-teal"
               placeholder="مثال: ريفانو كافيه"
             />
           </label>
           <label className="flex flex-col gap-2">
             <span className="text-note font-medium">رسالة القرب (٨٠ حرفًا كحد أقصى)</span>
             <input
-              className="rounded-card border border-navy/20 bg-cream px-4 py-3 text-navy outline-none focus-visible:border-teal"
+              className="rounded-card border border-navy/20 bg-warm-white px-4 py-3 text-navy outline-none focus-visible:border-teal"
               placeholder="أنت قريب من ريفانو — لديك ٣ أختام"
             />
             <span className="text-note text-navy/50">٣٤ / ٨٠</span>
@@ -181,7 +186,7 @@ export default function StylePage() {
             ▢
           </span>
           <p className="text-navy/70">لا توجد مكافآت بعد.</p>
-          <button className="rounded-pill bg-navy px-6 py-3 font-medium text-cream">
+          <button className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white">
             أضف أول مكافأة
           </button>
         </div>
@@ -190,13 +195,13 @@ export default function StylePage() {
       {/* ── Success screen (§10.4 "You're In!") ── */}
       <section className="flex flex-col gap-4">
         <h2 className="text-section">شاشة النجاح</h2>
-        <div className="flex flex-col items-center gap-4 rounded-container bg-cream p-10 text-center">
+        <div className="flex flex-col items-center gap-4 rounded-container bg-warm-white p-10 text-center">
           <span className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-teal/30 text-page-title text-teal">
             ✓
           </span>
           <p className="text-section font-arabic-display">تم!</p>
           <p className="text-navy/70">تمت إضافة بطاقة الولاء بنجاح.</p>
-          <button className="rounded-pill bg-navy px-6 py-3 font-medium text-cream">
+          <button className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white">
             عرض البطاقة
           </button>
         </div>
