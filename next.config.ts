@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Emits .next/standalone/server.js — the runtime image installs nothing.
+  output: "standalone",
   // The project lives outside the npm "workspace root" here, so Next would
   // otherwise try to trace files from the user home directory.
   outputFileTracingRoot: import.meta.dirname,

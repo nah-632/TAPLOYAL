@@ -22,7 +22,8 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-const { auth } = await import("../../src/identity/better-auth.ts");
+const { getAuth } = await import("../../src/identity/better-auth.ts");
+const auth = getAuth();
 const { default: postgres } = await import("postgres");
 const { resolveSession } = await import("../../src/identity/session.ts");
 const { getDb } = await import("../../src/db/client.ts");

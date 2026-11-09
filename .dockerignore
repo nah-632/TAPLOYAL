@@ -1,0 +1,22 @@
+node_modules
+.next
+.git
+.gitignore
+.test-build
+
+# Secrets must never reach the image build context.
+.env
+.env.local
+.env.*.local
+*.pem
+*.p12
+*.key
+
+# Not needed to build or run the app.
+docs
+test
+tools
+*.log
+README.md
+Dockerfile
+.dockerignore
