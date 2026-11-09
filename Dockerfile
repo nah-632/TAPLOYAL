@@ -14,7 +14,11 @@
 
 FROM node:22-alpine AS deps
 WORKDIR /app
+# tools/ must be present BEFORE the install: package.json's postinstall runs
+# tools/patch-next-for-sandbox.mjs. Outside the sandbox that script is a no-op,
+# but Node still has to be able to resolve the file.
 COPY package.json package-lock.json ./
+COPY tools ./tools
 RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
 FROM node:22-alpine AS builder

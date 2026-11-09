@@ -12,10 +12,10 @@ node_modules
 *.p12
 *.key
 
-# Not needed to build or run the app.
+# Not needed to build or run the app. Keep tools/: package.json's postinstall
+# hook executes tools/patch-next-for-sandbox.mjs during npm install.
 docs
 test
-tools
 *.log
 README.md
 Dockerfile
