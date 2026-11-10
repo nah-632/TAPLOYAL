@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { headers } from "next/headers";
+import QRCode from "qrcode";
 
+import { getMerchant } from "@/identity/merchant-repo";
 import { requireTenant } from "@/identity/server-session";
 import { SignOutButton } from "./sign-out-button";
 
@@ -23,6 +26,17 @@ export const dynamic = "force-dynamic";
  */
 export default async function DashboardPage() {
   const session = await requireTenant("/dashboard");
+  const merchant = await getMerchant(session);
+
+  // The join link the merchant prints on a poster (§3.A step 15). The host comes
+  // from the request so the link is correct on every domain we deploy to.
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const joinUrl = merchant?.slug ? `${proto}://${host}/j/${merchant.slug}` : "";
+  const qrSvg = joinUrl
+    ? await QRCode.toString(joinUrl, { type: "svg", margin: 1, width: 200 })
+    : "";
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-8 px-6 py-12">
@@ -63,6 +77,31 @@ export default async function DashboardPage() {
             <dd className="font-medium text-navy">{session.role}</dd>
           </div>
         </dl>
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-container border border-navy/10 bg-warm-white p-6">
+        <h2 className="text-section">رابط الانضمام ورمز QR</h2>
+        {joinUrl ? (
+          <div className="flex flex-wrap items-center gap-6">
+            <div
+              className="rounded-card bg-warm-white p-2 [&>svg]:h-[200px] [&>svg]:w-[200px]"
+              // Library-generated SVG (paths only); no user input reaches it.
+              dangerouslySetInnerHTML={{ __html: qrSvg }}
+            />
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <p className="text-note text-slate">اطبع هذا الرمز وضعه في متجرك:</p>
+              <code dir="ltr" className="truncate rounded-card border border-navy/15 bg-warm-white px-3 py-2 text-note text-navy">
+                {joinUrl}
+              </code>
+              <p className="text-note text-slate">
+                يفتح الرابط صفحة الانضمام بهوية نشاطك. لا يحتاج العميل تطبيقًا ولا كلمة
+                مرور.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-note text-slate">يظهر الرابط بعد إكمال معالج الإعداد.</p>
+        )}
       </section>
 
       <section className="flex flex-col gap-3">

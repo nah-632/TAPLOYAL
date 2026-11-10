@@ -92,7 +92,78 @@ if (dangling.length) {
   process.exit(1);
 }
 
+/* ---------------------------------------------------------------------------
+ * GUARD GAP closed (2026-11-10): `bg-cream` shipped after the `--color-cream`
+ * token was removed. Tailwind simply does not generate a utility for an unknown
+ * token, so the element renders with NO background and nothing fails - the same
+ * silent-failure class as a dangling var(). This checks every colour utility
+ * against the tokens defined above plus Tailwind's own default palette.
+ * ------------------------------------------------------------------------- */
+const colorTokens = new Set(
+  [...css.matchAll(/^\s*--color-([a-z0-9-]+)\s*:/gm)].map((m) => m[1]),
+);
+const textSizes = new Set([...css.matchAll(/^\s*--text-([a-z0-9-]+)\s*:/gm)].map((m) => m[1]));
+
+/** Tailwind's built-in palette is still available; list the family names. */
+const DEFAULT_FAMILIES = new Set([
+  "inherit", "current", "transparent", "black", "white",
+  "slate", "gray", "zinc", "neutral", "stone",
+  "red", "orange", "amber", "yellow", "lime", "green", "emerald",
+  "teal", "cyan", "sky", "blue", "indigo", "violet", "purple", "fuchsia", "pink", "rose",
+]);
+
+/** Non-colour suffixes that share a colour utility prefix. */
+const KEYWORDS = new Set([
+  "left", "center", "right", "justify", "start", "end", "wrap", "nowrap", "balance", "pretty",
+  "clip", "ellipsis", "top", "bottom", "middle", "baseline", "xs", "sm", "base", "lg", "xl",
+  "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl", "none", "auto", "dashed", "dotted",
+  "double", "solid", "hidden", "collapse", "separate", "cover", "contain", "fixed", "local",
+  "scroll", "opacity", "blend", "clip-text", "current", "1", "2", "4", "8", "0", "full",
+  "px", "flow", "repeat", "no", "origin", "gradient", "offset",
+]);
+
+const UTIL_RE = /\b(?:bg|text|border|ring|fill|stroke|from|via|to|decoration|outline|accent|caret|divide|shadow)-([a-z][a-z0-9-]*)/g;
+const unknownUtilities = [];
+
+for (const dir of SCAN_DIRS) {
+  for (const file of walk(path.join(ROOT, dir))) {
+    const rel = path.relative(ROOT, file);
+    // globals.css is raw CSS: `text-size-adjust` etc. are properties, not
+    // Tailwind utilities. Only class strings in components are scanned here.
+    if (rel === "app/globals.css" || rel.endsWith(".css")) continue;
+    readFileSync(file, "utf8")
+      .split("\n")
+      .forEach((line, i) => {
+        const code = line.split("//")[0];
+        for (const m of code.matchAll(UTIL_RE)) {
+          const raw = m[1];
+          const base = raw.replace(/-\d{2,3}$/, ""); // bg-red-500 -> red
+          if (
+            colorTokens.has(raw) ||
+            colorTokens.has(base) ||
+            textSizes.has(raw) ||
+            DEFAULT_FAMILIES.has(base) ||
+            KEYWORDS.has(raw)
+          ) {
+            continue;
+          }
+          unknownUtilities.push({ rel, line: i + 1, value: m[0] });
+        }
+      });
+  }
+}
+
+if (unknownUtilities.length) {
+  console.error(
+    `✗ check-tokens: ${unknownUtilities.length} colour utility(ies) reference a name that is not a token or a Tailwind colour\n`,
+  );
+  for (const u of unknownUtilities) {
+    console.error(`  ${u.rel}:${u.line}  uses "${u.value}" — Tailwind will silently emit nothing`);
+  }
+  process.exit(1);
+}
+
 console.log(
   `✓ check-tokens: no hard-coded colours or font families outside app/globals.css ` +
-    `(${defined.size} colour tokens defined, 0 dangling references)`,
+    `(${defined.size} colour tokens defined, 0 dangling references, all colour utilities resolve)`,
 );
