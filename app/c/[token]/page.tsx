@@ -19,8 +19,17 @@ import { serverOrigin } from "@/modules/site-url";
 export const dynamic = "force-dynamic";
 
 export default async function CardPage({ params }: { params: Promise<{ token: string }> }) {
-  const { token } = await params;
-  const card = await getPassByToken(decodeURIComponent(token));
+  const { token: routeToken } = await params;
+
+  // ENCODING BOUNDARY (bug fixed 2026-11-10): Next returns a dynamic PATH segment
+  // still percent-encoded, while a query parameter arrives already decoded. Decode
+  // exactly once here and treat `token` as the plain token everywhere below, so
+  // every URL built from it is encoded exactly once. Miss this and the token is
+  // double-encoded (%252F), the pass lookup hashes the wrong string, and every
+  // wallet link and QR code silently 404s — which is what happens for most
+  // base64 tokens, since they contain "+", "/" and "=".
+  const token = decodeURIComponent(routeToken);
+  const card = await getPassByToken(token);
   if (!card) notFound();
 
   // Desktop falls back to scanning: the QR points at this same page on the
