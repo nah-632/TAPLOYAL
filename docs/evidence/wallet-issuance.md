@@ -77,9 +77,14 @@ a QR, with links single-encoded (`%2B`, no `%252` anywhere in the DOM). The QR
 image was extracted and decoded with the Vision framework:
 
 ```
-payload: https://taployal-rvoepg.cranl.net/c/U3nk8H1W3LrSByT09G2YeI0kc%2BktyEN%2FoEdw0YUg8IU%3D
+payload: https://taployal-rvoepg.cranl.net/c/<card-token>
 symbology: VNBarcodeSymbologyQR
 ```
+
+The token itself is redacted here on purpose: it is a live capability URL, and this
+repository is public. The value that mattered in the check was the **shape** —
+that the token inside the QR is single-encoded (`%2B`, never `%252B`) and that the
+origin matches `APP_URL`.
 
 Layout QA on the same page: `dir=rtl`, `lang=ar`, horizontal overflow `0`,
 broken images `0`, Arabic body font loaded.
