@@ -12,7 +12,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 const ROOT = process.cwd();
-const ALLOWLIST = new Set(["app/globals.css", "lib/brand.ts"]);
+const ALLOWLIST = new Set([
+  "app/globals.css", // the CSS token source
+  "lib/brand.ts",
+  "src/palette/index.ts", // the JS mirror + merchant card presets (see its header)
+]);
 const SCAN_DIRS = ["app", "components", "lib", "src"];
 const EXT = new Set([".ts", ".tsx", ".js", ".jsx", ".css", ".mjs"]);
 

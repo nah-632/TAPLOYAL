@@ -1,4 +1,15 @@
 import Link from "next/link";
+import {
+  ArrowLeft,
+  Check,
+  Play,
+  Square,
+  Star,
+  TrendingDown,
+  TrendingUp,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 
 /**
  * SPEC §11 acceptance criterion: "a style page showing every brand token and
@@ -19,9 +30,9 @@ const COLORS = [
 ];
 
 const STATUS = [
-  { label: "نجاح", cls: "bg-success/10 text-success border-success/30", icon: "✓" },
-  { label: "تحذير", cls: "bg-warning/10 text-warning border-warning/30", icon: "!" },
-  { label: "خطأ", cls: "bg-error/10 text-error border-error/30", icon: "✕" },
+  { label: "نجاح", cls: "bg-success/10 text-success border-success/30", Icon: Check },
+  { label: "تحذير", cls: "bg-warning/10 text-warning border-warning/30", Icon: TriangleAlert },
+  { label: "خطأ", cls: "bg-error/10 text-error border-error/30", Icon: X },
 ];
 
 export default function StylePage() {
@@ -74,7 +85,7 @@ export default function StylePage() {
               key={s.label}
               className={`${s.cls} inline-flex items-center gap-2 rounded-pill border px-4 py-2 text-note font-medium`}
             >
-              <span aria-hidden>{s.icon}</span>
+              <s.Icon className="h-4 w-4" aria-hidden strokeWidth={2} />
               {s.label}
             </span>
           ))}
@@ -103,7 +114,7 @@ export default function StylePage() {
         <h2 className="text-section">الأزرار</h2>
         <div className="flex flex-wrap items-center gap-3">
           <button className="inline-flex items-center gap-2 rounded-pill bg-teal px-6 py-3 font-medium text-warm-white">
-            إجراء أساسي على خلفية داكنة <span aria-hidden>←</span>
+            إجراء أساسي على خلفية داكنة <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden strokeWidth={2} />
           </button>
           <button className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white">
             إجراء أساسي على خلفية فاتحة
@@ -115,12 +126,12 @@ export default function StylePage() {
             aria-label="تشغيل"
             className="flex h-12 w-12 items-center justify-center rounded-full bg-navy text-warm-white"
           >
-            <span aria-hidden>▶</span>
+            <Play className="h-4 w-4 rtl:rotate-180" aria-hidden strokeWidth={2} fill="currentColor" />
           </button>
         </div>
         <div className="rounded-container bg-navy p-6">
           <button className="inline-flex items-center gap-2 rounded-pill bg-teal px-6 py-3 font-medium text-warm-white">
-            زر ذهبي داخل قسم داكن <span aria-hidden>←</span>
+            زر ذهبي داخل قسم داكن <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden strokeWidth={2} />
           </button>
         </div>
       </section>
@@ -137,7 +148,7 @@ export default function StylePage() {
               <p className="text-page-title leading-none">8,210</p>
               <p className="text-note text-navy/60">إجمالي العملاء</p>
               <p className="text-note font-medium text-success">
-                <span aria-hidden>▲</span> 18% عن الفترة السابقة
+                <TrendingUp className="inline h-3.5 w-3.5" aria-hidden strokeWidth={2} /> 18% عن الفترة السابقة
               </p>
             </div>
           </div>
@@ -149,7 +160,7 @@ export default function StylePage() {
               <p className="text-page-title leading-none">1,240</p>
               <p className="text-note text-navy/60">المكافآت المستبدلة</p>
               <p className="text-note font-medium text-error">
-                <span aria-hidden>▼</span> 4% عن الفترة السابقة
+                <TrendingDown className="inline h-3.5 w-3.5" aria-hidden strokeWidth={2} /> 4% عن الفترة السابقة
               </p>
             </div>
           </div>
@@ -182,9 +193,7 @@ export default function StylePage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-section">الحالة الفارغة</h2>
         <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-navy/20 bg-white/50 p-10 text-center">
-          <span className="text-page-title" aria-hidden>
-            ▢
-          </span>
+          <Square className="h-8 w-8 text-slate" aria-hidden strokeWidth={1.5} />
           <p className="text-navy/70">لا توجد مكافآت بعد.</p>
           <button className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white">
             أضف أول مكافأة

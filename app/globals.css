@@ -95,4 +95,17 @@
     outline: 2px solid var(--color-teal);
     outline-offset: 2px;
   }
+
+  /* Motion must be opt-out: both design rules we follow require it, and the
+     merchant-facing wizard uses transitions the OS preference should silence. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

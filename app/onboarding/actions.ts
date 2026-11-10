@@ -66,5 +66,5 @@ export async function createBusiness(formData: FormData): Promise<void> {
     throw error;
   }
 
-  redirect("/dashboard");
+  redirect("/onboarding/brand");
 }

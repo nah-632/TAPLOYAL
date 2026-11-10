@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUp } from "@/identity/client";
+import { ErrorIcon } from "../_components/icons";
 
 /**
  * Merchant sign-up — BUILD-PROMPT §3.A step 3.
@@ -82,7 +83,7 @@ export function SignUpForm() {
           role="alert"
           className="rounded-card border border-error/30 bg-error/10 px-4 py-3 text-note text-error"
         >
-          <span aria-hidden>✕</span> {error}
+          <ErrorIcon /> {error}
         </p>
       )}
 

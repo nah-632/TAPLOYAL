@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getServerSession, getTenantSession } from "@/identity/server-session";
 import { createBusiness } from "./actions";
+import { ErrorIcon } from "../_components/icons";
 
 /** Reads the session cookie — must never be prerendered (see /dashboard). */
 export const dynamic = "force-dynamic";
@@ -65,7 +66,7 @@ export default async function OnboardingPage({
           role="alert"
           className="rounded-card border border-error/30 bg-error/10 px-4 py-3 text-note text-error"
         >
-          <span aria-hidden>✕</span> {ERRORS[error] ?? "تعذّر إكمال الخطوة."}
+          <ErrorIcon /> {ERRORS[error] ?? "تعذّر إكمال الخطوة."}
         </p>
       )}
 

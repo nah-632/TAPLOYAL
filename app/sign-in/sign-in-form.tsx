@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/identity/client";
+import { ErrorIcon, SuccessIcon } from "../_components/icons";
 
 /**
  * Sign-in — BUILD-PROMPT §3.A step 3 and §12.A ("can sign in and sign out").
@@ -50,7 +51,7 @@ export function SignInForm() {
           role="status"
           className="rounded-card border border-success/30 bg-success/10 px-4 py-3 text-note text-navy"
         >
-          <span aria-hidden>✓</span> تم إنشاء الحساب. سجّل الدخول للمتابعة.
+          <SuccessIcon /> تم إنشاء الحساب. سجّل الدخول للمتابعة.
         </p>
       )}
 
@@ -83,7 +84,7 @@ export function SignInForm() {
           role="alert"
           className="rounded-card border border-error/30 bg-error/10 px-4 py-3 text-note text-error"
         >
-          <span aria-hidden>✕</span> {error}
+          <ErrorIcon /> {error}
         </p>
       )}
 
