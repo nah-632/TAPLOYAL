@@ -60,3 +60,48 @@ export function normalizeHexColor(value: unknown): string | null {
   const v = value.trim().toLowerCase();
   return /^#[0-9a-f]{6}$/.test(v) ? v : null;
 }
+
+/* ---------------------------------------------------------------------------
+ * Wallet pass colour.
+ *
+ * WalletWallet exposes six named presets on every plan; a custom hex `color` is
+ * Pro-only. Sending a Pro-only field would make issuance start returning 400 the
+ * day the subscription changes, so the merchant's hex is mapped onto the nearest
+ * preset instead and the pass keeps working on the free plan forever.
+ *
+ * The rule is deliberately simple and hue-based, not a "nearest swatch" lookup
+ * against hex values we would have to invent: we do not know the provider's exact
+ * preset values, and guessing them would be a fabricated constant. Very dark
+ * colours map to `dark` regardless of hue, because on a pass a near-black face
+ * reads as intentional while a muddy dark blue does not.
+ * ------------------------------------------------------------------------- */
+export const WALLET_COLOR_PRESETS = ["dark", "blue", "green", "red", "purple", "orange"] as const;
+export type WalletColorPreset = (typeof WALLET_COLOR_PRESETS)[number];
+
+export function walletColorPreset(hex: unknown): WalletColorPreset {
+  const v = normalizeHexColor(hex) ?? PLATFORM.navy;
+  const r = Number.parseInt(v.slice(1, 3), 16);
+  const g = Number.parseInt(v.slice(3, 5), 16);
+  const b = Number.parseInt(v.slice(5, 7), 16);
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const lightness = (max + min) / 2 / 255;
+  if (lightness < 0.2) return "dark";
+
+  const delta = max - min;
+  if (delta === 0) return "dark"; // achromatic
+
+  let hue: number;
+  if (max === r) hue = 60 * (((g - b) / delta) % 6);
+  else if (max === g) hue = 60 * ((b - r) / delta + 2);
+  else hue = 60 * ((r - g) / delta + 4);
+  if (hue < 0) hue += 360;
+
+  if (hue < 15 || hue >= 345) return "red";
+  if (hue < 45) return "orange";
+  if (hue < 170) return "green";
+  if (hue < 260) return "blue";
+  if (hue < 320) return "purple";
+  return "red";
+}

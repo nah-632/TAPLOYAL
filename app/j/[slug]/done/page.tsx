@@ -1,17 +1,20 @@
 import Link from "next/link";
+import QRCode from "qrcode";
 
-import { SuccessIcon, WarningIcon } from "../../../_components/icons";
+import { AddToWallet } from "../../../_components/add-to-wallet";
+import { SuccessIcon } from "../../../_components/icons";
+import { serverOrigin } from "@/modules/site-url";
 
 /**
  * "You're In!" — BUILD-PROMPT §3.C steps 9-12 and §4 screens 4-5.
  *
- * WALLET HONESTY: the reference asks for "Add to Apple Wallet" / "Add to Google
- * Wallet" badges, and it also forbids modifying the official badges and claiming
- * an integration works before testing it. No Pass Type ID certificate and no
- * Google Wallet Issuer exist yet, so real passes cannot be issued. Rather than
- * render a badge that cannot work, this shows the wallet step as pending and
- * gives the browser card, which §3.C explicitly requires as the fallback:
- * "يجب توفير تجربة بديلة عبر المتصفح".
+ * WALLET STEP (updated): passes ARE issued now — through the hosted wallet
+ * provider, which signs Apple passes with its own Pass Type ID and mints Google
+ * save links from its own issuer, so no Apple or Google developer account is
+ * needed. The section below issues the pass on view and links to our own routes.
+ *
+ * The browser card §3.C requires as a fallback is still there and still the
+ * primary action: the wallet step is an addition, never a dependency.
  */
 export const dynamic = "force-dynamic";
 
@@ -24,6 +27,12 @@ export default async function DonePage({
 }) {
   const { t, again } = await searchParams;
   const token = t ?? "";
+
+  const origin = token ? await serverOrigin() : "";
+  const cardUrl = origin && token ? `${origin}/c/${encodeURIComponent(token)}` : "";
+  const qrDataUrl = cardUrl
+    ? await QRCode.toDataURL(cardUrl, { margin: 1, width: 224, errorCorrectionLevel: "M" })
+    : null;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-8 px-6 py-12 text-center">
@@ -42,30 +51,18 @@ export default async function DonePage({
       </div>
 
       {token ? (
-        <Link
-          href={`/c/${encodeURIComponent(token)}`}
-          className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white"
-        >
-          عرض البطاقة
-        </Link>
+        <>
+          <Link
+            href={`/c/${encodeURIComponent(token)}`}
+            className="rounded-pill bg-navy px-6 py-3 font-medium text-warm-white"
+          >
+            عرض البطاقة
+          </Link>
+          <AddToWallet token={token} qrDataUrl={qrDataUrl} />
+        </>
       ) : (
         <p className="text-note text-error">تعذّر إنشاء رابط البطاقة.</p>
       )}
-
-      <section className="flex flex-col gap-3 rounded-container border border-navy/10 bg-warm-white p-5 text-start">
-        <h2 className="text-section">إضافتها إلى المحفظة</h2>
-        <p className="flex items-start gap-2 text-note text-warning">
-          <WarningIcon className="mt-0.5" />
-          <span>
-            إصدار بطاقة Apple Wallet وGoogle Wallet يتطلب حسابات المطوّر الرسمية، ولم
-            تُفعَّل بعد — لذلك لا نعرض شعار «أضف إلى المحفظة» وهو لا يعمل.
-          </span>
-        </p>
-        <p className="text-note text-slate">
-          استخدم «عرض البطاقة» الآن؛ سيعمل الرابط نفسه عبر المتصفح على أي جهاز، وهو
-          البديل الذي يتطلبه المرجع.
-        </p>
-      </section>
 
       <Link href="/" className="text-note text-teal underline underline-offset-4">
         taployal

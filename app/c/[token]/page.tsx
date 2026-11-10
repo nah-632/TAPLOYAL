@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import QRCode from "qrcode";
 
+import { AddToWallet } from "../../_components/add-to-wallet";
 import { WalletCardPreview } from "../../_components/wallet-card-preview";
 import { getPassByToken } from "@/modules/enrollment";
+import { serverOrigin } from "@/modules/site-url";
 
 /**
  * Card web view — BUILD-PROMPT §3.C step 12 ("يستطيع الاطلاع على رصيده
@@ -19,6 +22,16 @@ export default async function CardPage({ params }: { params: Promise<{ token: st
   const { token } = await params;
   const card = await getPassByToken(decodeURIComponent(token));
   if (!card) notFound();
+
+  // Desktop falls back to scanning: the QR points at this same page on the
+  // customer's own origin, so the phone lands on a page that already knows how
+  // to pick the right wallet. Pointing it at the provider's page would leak the
+  // journey out of our domain for no benefit.
+  const origin = await serverOrigin();
+  const cardUrl = origin ? `${origin}/c/${encodeURIComponent(token)}` : "";
+  const qrDataUrl = cardUrl
+    ? await QRCode.toDataURL(cardUrl, { margin: 1, width: 224, errorCorrectionLevel: "M" })
+    : null;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-8 px-6 py-12">
@@ -56,6 +69,8 @@ export default async function CardPage({ params }: { params: Promise<{ token: st
       <p className="text-note text-slate">
         الرصيد يُحدَّث عند كل عملية يسجّلها الموظف. هذا الرابط خاص بك — لا تشاركه.
       </p>
+
+      <AddToWallet token={token} qrDataUrl={qrDataUrl} />
 
       <Link href="/" className="text-note text-teal underline underline-offset-4">
         taployal

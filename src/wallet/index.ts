@@ -40,6 +40,14 @@ export interface WalletIssueInput {
   backFields?: WalletField[];
   notification?: string;
   locations?: WalletLocation[];
+  /**
+   * Card-face colour, expressed as a provider preset rather than a hex value.
+   * Drivers that cannot honour it ignore it; the caller must never depend on the
+   * exact colour it asked for (see src/palette/index.ts for why it is a preset).
+   */
+  colorPreset?: string;
+  /** Value must change on the lock screen for the pass to be worth updating. */
+  sharingProhibited?: boolean;
 }
 
 export interface WalletArtifacts {
@@ -202,9 +210,26 @@ export function getWalletProvider(): WalletProvider {
   return active;
 }
 
+/**
+ * The Google save link is a JWT minted by the provider and stored on the pass.
+ * We redirect to it, so it is an open-redirect sink if it is ever wrong: only
+ * Google's own save hosts are accepted, and only over HTTPS. Stored data is
+ * still data (§3.3) — validating at the redirect is the cheap second control.
+ */
+const GOOGLE_SAVE_HOSTS = new Set(["pay.google.com", "wallet.google.com"]);
+
+export function isAllowedGoogleSaveUrl(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && GOOGLE_SAVE_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 /** Human-readable reason for the UI, without leaking provider internals. */
-export function walletErrorMessage(kind: WalletErrorKind): string {
-  switch (kind) {
+export function walletErrorMessage(kind: WalletErrorKind): string {  switch (kind) {
     case "not_configured":
       return "إصدار بطاقة المحفظة غير مُهيَّأ على هذا النشر بعد.";
     case "quota_exceeded":

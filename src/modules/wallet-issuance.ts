@@ -8,6 +8,7 @@ import {
   type WalletErrorKind,
   type WalletIssueInput,
 } from "@/wallet";
+import { walletColorPreset } from "@/palette";
 
 /**
  * Wallet issuance for an existing pass.
@@ -40,6 +41,42 @@ export class WalletIssuanceError extends Error {
     super(message ?? walletErrorMessage(kind));
     this.name = "WalletIssuanceError";
   }
+}
+
+/**
+ * HTTP status per failure kind, so all three wallet routes answer the same way.
+ * `not_configured` is 503 rather than 500 on purpose: nothing is broken in the
+ * code, the deployment is simply missing its key, and the UI says so.
+ */
+export function walletHttpStatus(kind: WalletErrorKind): number {
+  switch (kind) {
+    case "invalid_request":
+      return 404;
+    case "not_configured":
+      return 503;
+    case "rate_limited":
+    case "quota_exceeded":
+      return 429;
+    default:
+      return 502;
+  }
+}
+
+/** Uniform JSON error body. Never carries the token or provider internals. */
+export function walletFailure(error: unknown): {
+  status: number;
+  body: { error: string; kind: WalletErrorKind; retryable: boolean };
+} {
+  const kind: WalletErrorKind = error instanceof WalletIssuanceError ? error.kind : "upstream";
+  const retryable = kind === "upstream" || kind === "rate_limited";
+  return {
+    status: walletHttpStatus(kind),
+    body: {
+      error: error instanceof WalletIssuanceError ? error.message : walletErrorMessage(kind),
+      kind,
+      retryable,
+    },
+  };
 }
 
 /* ---------------------------------------------------------------------------
@@ -84,6 +121,7 @@ interface PassRow {
   out_program_name: string;
   out_mode: string;
   out_stamps_required: number | null;
+  out_primary_color: string | null;
   out_has_apple: boolean;
   out_google_url: string | null;
   out_share_url: string | null;
@@ -118,32 +156,79 @@ async function recordError(token: string, message: string): Promise<void> {
   }
 }
 
+/**
+ * Provider field limits (WalletWallet API reference). Exceeding any of these is
+ * a hard 400, so every string that comes from merchant- or customer-entered data
+ * is clipped here rather than trusted to be short.
+ */
+const CLIP = { text: 64, value: 256, description: 128, barcode: 1024 } as const;
+
+function clip(value: string | null | undefined, max: number): string {
+  const v = (value ?? "").trim();
+  return v.length <= max ? v : v.slice(0, max);
+}
+
 /** Builds the provider payload from the pass and its programme. */
 function buildInput(pass: PassRow): WalletIssueInput {
-  const unit = pass.out_mode === "points" ? "نقطة" : "ختم";
+  const isPoints = pass.out_mode === "points";
+  const unit = isPoints ? "نقطة" : "ختم";
   const remaining =
     pass.out_stamps_required == null ? null : Math.max(0, pass.out_stamps_required - pass.out_balance);
 
+  const backFields = [
+    { label: "رقم البطاقة", value: clip(pass.out_serial, CLIP.value) },
+    pass.out_first_name
+      ? { label: "الاسم", value: clip(pass.out_first_name, CLIP.value) }
+      : null,
+  ].filter((f): f is { label: string; value: string } => f !== null && f.value.length > 0);
+
   return {
     // The barcode carries our serial and nothing else — never personal data.
-    barcodeValue: pass.out_serial,
+    barcodeValue: clip(pass.out_serial, CLIP.barcode),
     barcodeFormat: "QR",
-    logoText: pass.out_program_name || pass.out_business_name,
-    organizationName: pass.out_business_name.slice(0, 64),
-    description: `${pass.out_business_name} — بطاقة الولاء`,
+    logoText: clip(pass.out_program_name || pass.out_business_name, CLIP.text),
+    organizationName: clip(pass.out_business_name, CLIP.text),
+    description: clip(`${pass.out_business_name} — بطاقة الولاء`, CLIP.description),
+    // Free-plan-safe branding: a preset, never a custom hex or an image URL.
+    colorPreset: walletColorPreset(pass.out_primary_color),
+    sharingProhibited: true,
     primaryFields: [
-      { label: "", value: String(pass.out_balance) },
-      { label: unit === "نقطة" ? "النقاط" : "الأختام", value: unit },
+      { label: "", value: clip(String(pass.out_balance), CLIP.value) },
+      { label: isPoints ? "النقاط" : "الأختام", value: unit },
     ],
     secondaryFields:
       remaining == null
         ? []
-        : [{ label: "المتبقي للمكافأة", value: String(remaining) }],
-    backFields: [
-      { label: "رقم البطاقة", value: pass.out_serial },
-      { label: "الاسم", value: pass.out_first_name },
-    ],
+        : [{ label: "المتبقي للمكافأة", value: clip(String(remaining), CLIP.value) }],
+    backFields,
   };
+}
+
+/** The state to render, built from one read of the pass. */
+function toState(pass: PassRow, token: string, configured: boolean): WalletState {
+  const hasApple = pass.out_has_apple;
+  const googleUrl = pass.out_google_url;
+  return {
+    configured,
+    issued: hasApple && !!googleUrl,
+    hasApple,
+    googleUrl,
+    shareUrl: pass.out_share_url,
+    provider: pass.out_provider,
+    error: pass.out_error,
+    appleUrl: hasApple ? `/api/wallet/${encodeURIComponent(token)}/apple` : null,
+  };
+}
+
+/**
+ * Read-only status. Performs no provider call and spends no quota, so it is safe
+ * to hit on every page view (including a prefetch or a crawler that never taps
+ * anything). Returns null when the token does not unlock an active pass.
+ */
+export async function getWalletStatus(token: string): Promise<WalletState | null> {
+  const pass = await readPass(token);
+  if (!pass) return null;
+  return toState(pass, token, getWalletProvider().configured);
 }
 
 /**
@@ -155,18 +240,7 @@ export async function ensureWalletArtifacts(token: string): Promise<WalletState>
   const pass = await readPass(token);
   if (!pass) throw new WalletIssuanceError("invalid_request", "رابط البطاقة غير صالح.");
 
-  const appleUrl = `/api/wallet/${encodeURIComponent(token)}/apple`;
-
-  const cached: WalletState = {
-    configured: provider.configured,
-    issued: pass.out_has_apple && !!pass.out_google_url,
-    hasApple: pass.out_has_apple,
-    googleUrl: pass.out_google_url,
-    shareUrl: pass.out_share_url,
-    provider: pass.out_provider,
-    error: pass.out_error,
-    appleUrl: pass.out_has_apple ? appleUrl : null,
-  };
+  const cached = toState(pass, token, provider.configured);
 
   // Already issued: serve from cache, spend no quota.
   if (cached.issued) return cached;
@@ -201,7 +275,7 @@ export async function ensureWalletArtifacts(token: string): Promise<WalletState>
       shareUrl: artifacts.shareUrl,
       provider: provider.driver,
       error: null,
-      appleUrl,
+      appleUrl: `/api/wallet/${encodeURIComponent(token)}/apple`,
     };
   } catch (error) {
     const kind = error instanceof WalletProviderError ? error.kind : "upstream";
@@ -211,13 +285,17 @@ export async function ensureWalletArtifacts(token: string): Promise<WalletState>
   }
 }
 
-/** The cached .pkpass, for the download route. Null when not issued yet. */
+/**
+ * The signed .pkpass, for the download route. Null when not issued yet.
+ *
+ * Goes through app_apple_pass_by_token() rather than selecting from `passes`:
+ * the runtime role is taployal_app under FORCE RLS, and the visitor holding a
+ * card link has no tenant context, so a direct query matches zero rows. Reading
+ * `passes` here looked correct and would have 404'd every download in production.
+ */
 export async function getApplePass(token: string): Promise<string | null> {
-  const rows = await getDb().execute(sql`
-    SELECT apple_pass_b64 FROM passes
-    WHERE web_view_token_hash = encode(digest(${token}, 'sha256'), 'hex')
-      AND length(${token}) >= 20
-  `);
-  const row = (rows as unknown as { apple_pass_b64: string | null }[])[0];
-  return row?.apple_pass_b64 ?? null;
+  if (!token || token.length < 20) return null;
+  const rows = await getDb().execute(sql`SELECT app_apple_pass_by_token(${token}) AS b64`);
+  const row = (rows as unknown as { b64: string | null }[])[0];
+  return row?.b64 ?? null;
 }

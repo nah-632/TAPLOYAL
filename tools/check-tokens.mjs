@@ -125,6 +125,20 @@ const KEYWORDS = new Set([
 const UTIL_RE = /\b(?:bg|text|border|ring|fill|stroke|from|via|to|decoration|outline|accent|caret|divide|shadow)-([a-z][a-z0-9-]*)/g;
 const unknownUtilities = [];
 
+/**
+ * FALSE POSITIVE FIXED (2026-11-10): a component file named `add-to-wallet` made
+ * every import of it look like the gradient utility `to-wallet`, and the guard
+ * reported a colour violation on an import line. A module specifier can never be
+ * a class name, so the specifier is stripped before scanning. The check itself is
+ * unchanged: anything inside a className string is still scanned in full.
+ */
+function stripModuleSpecifiers(line) {
+  return line
+    .replace(/\bfrom\s*["'][^"']*["']/g, "from")
+    .replace(/\bimport\s*["'][^"']*["']/g, "import")
+    .replace(/\brequire\(\s*["'][^"']*["']\s*\)/g, "require()");
+}
+
 for (const dir of SCAN_DIRS) {
   for (const file of walk(path.join(ROOT, dir))) {
     const rel = path.relative(ROOT, file);
@@ -134,7 +148,7 @@ for (const dir of SCAN_DIRS) {
     readFileSync(file, "utf8")
       .split("\n")
       .forEach((line, i) => {
-        const code = line.split("//")[0];
+        const code = stripModuleSpecifiers(line.split("//")[0]);
         for (const m of code.matchAll(UTIL_RE)) {
           const raw = m[1];
           const base = raw.replace(/-\d{2,3}$/, ""); // bg-red-500 -> red

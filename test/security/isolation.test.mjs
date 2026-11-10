@@ -207,13 +207,26 @@ async function main() {
     TRUNCATE _rls_probe;
     SET ROLE taployal_app;
     SET app.is_super_admin = 'true';
-    INSERT INTO _rls_probe(probe,visible) SELECT 'super:merchants', count(*) FROM merchants;
-    INSERT INTO _rls_probe(probe,visible) SELECT 'super:customers', count(*) FROM customers;
+    INSERT INTO _rls_probe(probe,visible) SELECT 'super:fixture-merchants', count(*) FROM merchants WHERE id IN ('${MA}','${MB}');
+    INSERT INTO _rls_probe(probe,visible) SELECT 'super:fixture-customers', count(*) FROM customers WHERE merchant_id IN ('${MA}','${MB}');
+    INSERT INTO _rls_probe(probe,visible) SELECT 'super:unfiltered-merchants', count(*) FROM merchants;
     RESET ROLE;
   `);
   p = await readProbes();
-  check("super:merchants (sees both)", p.get("super:merchants"), 2);
-  check("super:customers (sees both)", p.get("super:customers"), 2);
+  // SCOPED TO THE FIXTURES ON PURPOSE (2026-11-10). This assertion used to be a
+  // global `count(*) FROM merchants = 2`, which quietly coupled the suite to the
+  // rest of the database: once two real merchants existed on the deployment, the
+  // suite reported a cross-tenant leak that was not one. The invariant being
+  // tested is "RLS stops filtering for a super admin" — with app.merchant_id
+  // unset, only the super-admin branch of the policy can match, so seeing BOTH
+  // fixtures is exactly the proof, and it is immune to unrelated live data.
+  check("super:sees fixture tenant A and B merchants", p.get("super:fixture-merchants"), 2);
+  check("super:sees fixture tenant A and B customers", p.get("super:fixture-customers"), 2);
+  const unfilteredMerchants = p.get("super:unfiltered-merchants");
+  const superSeesEverything = unfilteredMerchants >= 2;
+  console.log(
+    `  ${superSeesEverything ? "✓" : "✗"} unfiltered merchant count = ${unfilteredMerchants} (>= the 2 fixtures)`,
+  );
 
   console.log("\n──── PHASE 5: CANARY — prove the suite can FAIL ────");
   await runSql(
@@ -241,7 +254,7 @@ async function main() {
   console.log("\n════ SUMMARY ════");
   console.log(`assertions: ${results.length} · failed: ${failed.length} · canary detected: ${canaryDetected}`);
   for (const f of failed) console.log(`  FAIL ${f.name}: got ${f.actual}, expected ${f.expected}`);
-  process.exit(failed.length === 0 && canaryDetected ? 0 : 1);
+  process.exit(failed.length === 0 && canaryDetected && superSeesEverything ? 0 : 1);
 }
 
 main().catch((e) => {
