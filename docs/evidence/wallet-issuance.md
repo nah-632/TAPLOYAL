@@ -66,9 +66,14 @@ the idempotency claim proven by an external counter rather than by our own cache
 
 ```
 hexBackgroundColor: #18181b   (the "dark" preset, derived from the merchant's colour)
-barcode value:      TPBBB8B356F21268F82E   (our card serial — no personal data)
-الاسم / Huda                                  ← first name only, never "Huda Wallet"
+barcode value:      TPBBB…     (our card serial — no personal data)
+الاسم / Hxxx                                  ← first name only, never the full name
 ```
+
+Name and serial are redacted here as well: this repository is public and both
+belong to a row that exists in the live database. What the check proved is the
+**shape** — the barcode carries the card serial and never personal data, and the
+name field carries the first token of the joined name only.
 
 ## 4. Desktop branch and the QR
 
